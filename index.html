@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wat kan ik doen?">
+<meta name="theme-color" content="#0f1115">
+<title>Wat kan ik doen?</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{
+  --bg:#0f1115;--card:#181b22;--card2:#20242d;--line:#2a2f3a;
+  --txt:#f2f4f8;--mut:#9aa3b2;--acc:#ff7a1a;--acc2:#ffb347;--ok:#35c97a;--fav:#ff4d6d;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(78px + env(safe-area-inset-bottom))}
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:28px;margin:8px 0 2px;letter-spacing:-.5px}
+.sub{color:var(--mut);margin:0 0 16px;font-size:15px}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mut);margin:14px 0 8px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--txt);padding:8px 13px;border-radius:999px;font-size:14px;cursor:pointer;user-select:none}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
+.big{width:100%;margin:20px 0 6px;padding:18px;border:0;border-radius:18px;font-size:20px;font-weight:800;color:#111;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));cursor:pointer;box-shadow:0 8px 24px rgba(255,122,26,.25)}
+.big:active{transform:scale(.98)}
+.hint{color:var(--mut);font-size:13px;text-align:center;margin:0}
+.result{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;margin-top:18px;text-align:center;display:none}
+.result.show{display:block;animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+.result .emo{font-size:64px;line-height:1}
+.result h2{margin:10px 0 6px;font-size:24px}
+.result p{color:#cdd3dd;margin:0 0 12px;line-height:1.45}
+.tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.tag{font-size:12px;background:var(--card2);color:var(--mut);padding:4px 9px;border-radius:999px}
+.row{display:flex;gap:8px}
+.btn{flex:1;padding:13px 8px;border-radius:14px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:15px;font-weight:600;cursor:pointer}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#06210f}
+.btn.fav.on{color:var(--fav);border-color:var(--fav)}
+.list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.item .e{font-size:30px;width:38px;text-align:center}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;font-size:16px}
+.item .t span{color:var(--mut);font-size:13px}
+.ib{background:none;border:0;color:var(--mut);font-size:20px;padding:6px;cursor:pointer}
+.empty{color:var(--mut);text-align:center;padding:30px 10px;line-height:1.5}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 14px}
+.stat div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:24px;color:var(--acc)}
+.stat span{font-size:12px;color:var(--mut)}
+input,select,textarea{width:100%;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:12px;font-size:16px;font-family:inherit}
+textarea{resize:vertical;min-height:60px}
+.form{display:flex;flex-direction:column;gap:10px;background:var(--card2);padding:14px;border-radius:16px;margin-bottom:14px}
+.form .row select{flex:1}
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(15,17,21,.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:10}
+nav button{background:none;border:0;color:var(--mut);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;flex:1}
+nav button i{font-style:normal;font-size:22px}
+nav button.on{color:var(--acc)}
+.page{display:none}.page.on{display:block}
+.cat{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.cat button{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 10px;color:var(--txt);font-size:15px;font-weight:600;cursor:pointer;text-align:left}
+.cat button i{font-style:normal;font-size:26px;display:block;margin-bottom:6px}
+.cat button small{color:var(--mut);font-weight:400}
+.back{background:none;border:0;color:var(--acc);font-size:16px;padding:0;margin:4px 0 6px;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--ok);color:#06210f;padding:10px 16px;border-radius:999px;font-weight:700;opacity:0;transition:.3s;pointer-events:none;z-index:20}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ONTDEKKEN -->
+<section class="page on" id="p-home">
+  <h1>Wat kan ik doen? 🤔</h1>
+  <p class="sub">Verveel je je? Kies wat je wil en druk op de knop.</p>
+
+  <div class="label">Waar?</div>
+  <div class="chips" data-f="waar">
+    <span class="chip on" data-v="*">Maakt niet uit</span>
+    <span class="chip" data-v="b">🏠 Binnen</span>
+    <span class="chip" data-v="u">🌳 Buiten</span>
+  </div>
+
+  <div class="label">Met wie?</div>
+  <div class="chips" data-f="wie">
+    <span class="chip on" data-v="*">Maakt niet uit</span>
+    <span class="chip" data-v="a">🙋 Alleen</span>
+    <span class="chip" data-v="s">👥 Met vrienden</span>
+    <span class="chip" data-v="f">👨‍👦 Met familie</span>
+  </div>
+
+  <div class="label">Hoeveel tijd?</div>
+  <div class="chips" data-f="tijd">
+    <span class="chip on" data-v="*">Maakt niet uit</span>
+    <span class="chip" data-v="15">⚡ Kwartiertje</span>
+    <span class="chip" data-v="60">⏱️ Uurtje</span>
+    <span class="chip" data-v="999">🕐 Lang</span>
+  </div>
+
+  <div class="label">Energie?</div>
+  <div class="chips" data-f="energie">
+    <span class="chip on" data-v="*">Maakt niet uit</span>
+    <span class="chip" data-v="1">😌 Rustig</span>
+    <span class="chip" data-v="2">🙂 Normaal</span>
+    <span class="chip" data-v="3">🔥 Vol gas</span>
+  </div>
+
+  <div class="label">Extra</div>
+  <div class="chips">
+    <span class="chip" id="noScreen">📵 Zonder scherm</span>
+    <span class="chip" id="free">💸 Gratis</span>
+  </div>
+
+  <button class="big" id="go">🎲 Geef me iets!</button>
+  <p class="hint" id="count"></p>
+
+  <div class="result" id="res"></div>
+</section>
+
+<!-- CATEGORIEËN -->
+<section class="page" id="p-cat">
+  <h1>Categorieën 📂</h1>
+  <p class="sub">Kies zelf waar je zin in hebt.</p>
+  <div id="catView"></div>
+</section>
+
+<!-- FAVORIETEN -->
+<section class="page" id="p-fav">
+  <h1>Favorieten ❤️</h1>
+  <p class="sub">Dingen die je leuk vindt.</p>
+  <div class="list" id="favList"></div>
+</section>
+
+<!-- EIGEN IDEEËN -->
+<section class="page" id="p-own">
+  <h1>Eigen ideeën ✏️</h1>
+  <p class="sub">Zet je eigen dingen erbij. Die komen ook uit de knop.</p>
+  <div class="form">
+    <input id="oTitle" placeholder="Wat? (bijv. Fifa toernooi met Daan)" maxlength="60">
+    <textarea id="oDesc" placeholder="Uitleg (mag leeg)" maxlength="200"></textarea>
+    <div class="row">
+      <select id="oWaar"><option value="b">🏠 Binnen</option><option value="u">🌳 Buiten</option></select>
+      <select id="oWie"><option value="a">🙋 Alleen</option><option value="s">👥 Vrienden</option><option value="f">👨‍👦 Familie</option></select>
+    </div>
+    <div class="row">
+      <select id="oCat"></select>
+      <input id="oEmo" placeholder="Emoji" maxlength="4" style="flex:0 0 90px;text-align:center">
+    </div>
+    <button class="btn ok" id="oAdd">+ Toevoegen</button>
+  </div>
+  <div class="list" id="ownList"></div>
+</section>
+
+<!-- GEDAAN -->
+<section class="page" id="p-done">
+  <h1>Gedaan ✅</h1>
+  <p class="sub">Alles wat je al gedaan hebt.</p>
+  <div class="stat">
+    <div><b id="sTot">0</b><span>totaal</span></div>
+    <div><b id="sWeek">0</b><span>deze week</span></div>
+    <div><b id="sStreak">0</b><span>dagen op rij</span></div>
+  </div>
+  <div class="list" id="doneList"></div>
+</section>
+
+</div>
+
+<nav>
+  <button class="on" data-p="home"><i>🎲</i>Ontdekken</button>
+  <button data-p="cat"><i>📂</i>Categorieën</button>
+  <button data-p="fav"><i>❤️</i>Favorieten</button>
+  <button data-p="own"><i>✏️</i>Eigen</button>
+  <button data-p="done"><i>✅</i>Gedaan</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== CATEGORIEËN ===== */
+const CATS = {
+  voetbal:{n:"Voetbal",e:"⚽"},
+  sport:{n:"Sport & bewegen",e:"🏃"},
+  buiten:{n:"Buiten avontuur",e:"🌲"},
+  creatief:{n:"Creatief & maken",e:"🎨"},
+  leren:{n:"Slimmer worden",e:"🧠"},
+  ai:{n:"AI",e:"🤖"},
+  techniek:{n:"Techniek & bouwen",e:"🔧"},
+  koken:{n:"Koken & bakken",e:"🍳"},
+  spel:{n:"Spellen & games",e:"🎮"},
+  chill:{n:"Chillen & ontspannen",e:"😎"},
+  groei:{n:"Beter worden & mindset",e:"📈"},
+  helpen:{n:"Helpen & geld verdienen",e:"🤝"},
+  vrienden:{n:"Met vrienden",e:"👥"}
+};
+
+/* ===== IDEEËN =====
+ [emoji, titel, uitleg, categorie, waar(b/u/bu), wie(a/s/f, mag combi), minuten, energie 1-3, scherm 0/1, kost 0/1] */
+const RAW = [
+ ["⚽","Hoge balletjes record","Hoe vaak kun je de bal hooghouden? Probeer je record te breken. Wissel links, rechts en dij.","voetbal","u","a",15,2,0,0],
+ ["🎯","Muurschieten","Pass tegen een muur, 50x links en 50x rechts. Probeer de bal direct terug te kaatsen.","voetbal","u","a",20,2,0,0],
+ ["🥅","Penalty battle","Om de beurt penalty's nemen. Wie mist, is keeper. Best of 10.","voetbal","u","sf",30,2,0,0],
+ ["🔁","Dribbel-parcours","Leg flesjes, schoenen of pionnen neer en dribbel er zo snel mogelijk doorheen. Klok je tijd!","voetbal","u","a",20,3,0,0],
+ ["📺","Kijk een prof-skill na","Zoek één skill op (bijv. de elastico of Cruijff-draai) en oefen die tot je hem 5x achter elkaar kunt.","voetbal","bu","a",30,2,1,0],
+ ["🏟️","Partijtje op het pleintje","Bel een paar vrienden en speel een potje op het trapveldje.","voetbal","u","s",60,3,0,0],
+ ["👟","Balletje binnen met een tennisbal","Hooghouden met een tennisbal is véél moeilijker. Perfect voor je touch (pas op voor de lamp 😅).","voetbal","b","a",15,1,0,0],
+ ["🎥","Maak een skillvideo","Film jezelf met 5 trucs en maak er een coole edit van.","voetbal","u","as",45,2,1,0],
+ ["🧱","Lattenschieten","Wie raakt als eerste 3x de lat of paal? Lukt ook op een klein doeltje.","voetbal","u","s",30,2,0,0],
+ ["🥏","Voetvolley","Hoog houden met z'n tweeën of drieën, zonder dat de bal de grond raakt.","voetbal","u","s",20,2,0,0],
+ ["🤸","Snelheidsladder","Teken een ladder met stoepkrijt en oefen voetenwerk: in-in-uit-uit, zijwaarts, hinkelen.","sport","u","a",15,3,0,0],
+ ["🚴","Fietstocht","Fiets een rondje van 10 km door een stuk dat je nog niet kent.","sport","u","asf",60,2,0,0],
+ ["🏃","Sprint-interval","10x 30 meter sprinten, teruglopen is rust. Daarna lekker uitlopen.","sport","u","a",15,3,0,0],
+ ["💪","Home workout","3 rondes: 15 squats, 10 push-ups, 20 lunges, 30 sec plank. Klaar!","sport","b","a",15,3,0,0],
+ ["🏀","Basketballen","Ga naar een pleintje met een basket en speel HORSE of 1-tegen-1.","sport","u","s",45,3,0,0],
+ ["🏓","Tafeltennissen","Bij een buurthuis, op school of in het park staat vaak een tafel.","sport","u","sf",30,2,0,0],
+ ["🛹","Skaten of steppen","Ga naar het skatepark en leer één nieuw trucje.","sport","u","as",60,3,0,0],
+ ["🏊","Zwemmen","Ga naar het zwembad. Doe een paar baantjes en spring van de duikplank.","sport","b","sf",90,3,0,1],
+ ["🧘","Stretchen & foamrollen","10 minuten rekken: hamstrings, liezen, heupen. Je benen worden je dankbaar.","sport","b","a",15,1,0,0],
+ ["🪢","Touwtjespringen","Hoeveel sprongen achter elkaar? Probeer ook dubbele sprongen.","sport","u","a",10,3,0,0],
+ ["🥊","Schaduwboksen","3 rondes van 2 minuten boksen tegen de lucht. Snel en hard, goed voor je conditie.","sport","b","a",10,3,0,0],
+ ["🏐","Volleybal of beachvolley","Met een gewone bal kan het ook. Pak vrienden en een veldje.","sport","u","s",45,3,0,0],
+ ["🌲","Bos-verkenning","Ga een stuk bos in waar je nog nooit bent geweest. Neem een snack mee.","buiten","u","asf",90,2,0,0],
+ ["🗺️","Geocachen","Download de gratis Geocaching-app en zoek een verstopte schat in de buurt.","buiten","u","asf",60,2,1,0],
+ ["🎣","Vissen","Een hengel en wat brood of maden. Geduld = de sport.","buiten","u","asf",120,1,0,1],
+ ["🏕️","Hut bouwen","Bouw een hut in het bos of in de tuin van takken, kleden of karton.","buiten","u","sf",90,2,0,0],
+ ["📸","Foto-jacht","Maak 10 foto's: iets roods, iets kleins, een dier, iets grappigs, iets ouds… Wie maakt de beste?","buiten","u","as",45,2,1,0],
+ ["🌅","Zonsondergang kijken","Zoek een hoog punt of een open veld en kijk hoe de zon ondergaat.","buiten","u","asf",30,1,0,0],
+ ["🐦","Dieren spotten","Hoeveel verschillende vogels of dieren zie je in een half uur?","buiten","u","asf",30,1,0,0],
+ ["⭐","Sterren kijken","Als het donker is: ga liggen en zoek de Grote Beer en de Poolster.","buiten","u","asf",30,1,0,0],
+ ["🪁","Vliegeren","Bij wind: ga naar een open veld met een vlieger.","buiten","u","asf",45,2,0,0],
+ ["💧","Waterballonnen-gevecht","Als het warm is: water erin en gaan!","buiten","u","s",30,3,0,0],
+ ["🧗","Klimmen","Klimbos, boulderhal of gewoon een goede boom (voorzichtig!).","buiten","bu","as",90,3,0,1],
+ ["🎨","Tekenen","Teken je favoriete voetballer, je huis, of iets uit je fantasie.","creatief","b","a",30,1,0,0],
+ ["✍️","Schrijf een verhaal","Begin met: 'Toen ik wakker werd, kon ik ineens…' en schrijf verder.","creatief","b","a",30,1,0,0],
+ ["🎬","Stop-motion filmpje","Maak met Lego of poppetjes een kort filmpje, foto voor foto.","creatief","b","as",60,1,1,0],
+ ["🎵","Muziek maken","Maak een beat in GarageBand of op een gratis app.","creatief","b","a",45,1,1,0],
+ ["🧱","Lego bouwen","Bouw iets zonder instructies. Bijvoorbeeld een stadion.","creatief","b","as",60,1,0,0],
+ ["📦","Knutselen met karton","Een doos is een schat: maak een doeltje, een robot of een flipperkast.","creatief","b","asf",60,2,0,0],
+ ["🖍️","Stoepkrijten","Maak een veld, een hinkelbaan of een gigantische tekening op straat.","creatief","u","as",30,2,0,0],
+ ["📓","Ontwerp je eigen voetbalshirt","Teken je eigen tenue met logo, sponsor en rugnummer.","creatief","b","a",20,1,0,0],
+ ["🎤","Maak een podcast","Neem met een vriend een gesprek op over voetbal of games.","creatief","b","s",45,1,1,0],
+ ["🧩","Puzzelen","Leg een legpuzzel. Hoe meer stukjes, hoe beter.","creatief","b","af",60,1,0,0],
+ ["📚","Lees een hoofdstuk","Pak een boek of strip en lees één hoofdstuk. Of twee 😉.","leren","b","a",20,1,0,0],
+ ["♟️","Leer schaken","Leer de zetten, of speel een potje tegen iemand thuis.","leren","b","af",30,1,0,0],
+ ["🌍","Vlaggenquiz","Hoeveel landen en vlaggen ken jij? Doe een quiz of test je familie.","leren","b","af",15,1,1,0],
+ ["🔬","Proefje doen","Mentos in cola (buiten!), een lavalamp met olie of een ei in azijn.","leren","bu","af",30,2,0,0],
+ ["🤓","Leer 10 woorden in een andere taal","Spaans, Duits, Engels… Handig voor op vakantie.","leren","b","a",15,1,1,0],
+ ["🧮","Hoofdreken-battle","Wie rekent het snelst? Maak sommen voor elkaar.","leren","b","sf",15,1,0,0],
+ ["🎞️","Kijk een docu","Kijk een documentaire over een voetbalclub, de ruimte of dieren.","leren","b","af",60,1,1,0],
+ ["🧠","Leer iets nieuws op YouTube","Hoe werkt een raket? Waarom is de lucht blauw? Kies één vraag en zoek het uit.","leren","b","a",20,1,1,0],
+ ["⌨️","Leer programmeren","Probeer Scratch of een gratis code-site. Maak je eigen spelletje.","leren","b","a",45,1,1,0],
+ ["🥞","Pannenkoeken bakken","Bloem, melk, eieren. Wie kan hem het hoogst omdraaien?","koken","b","af",45,2,0,0],
+ ["🍪","Koekjes bakken","Bak een plaat koekjes en deel ze uit (of niet 😁).","koken","b","af",60,1,0,0],
+ ["🥤","Smoothie maken","Banaan, aardbeien, yoghurt en een beetje honing in de blender.","koken","b","a",10,1,0,0],
+ ["🍕","Zelf pizza maken","Maak je eigen pizza met je favoriete toppings.","koken","b","f",60,1,0,0],
+ ["🍳","Kook vanavond","Kies een recept en kook het avondeten voor het hele gezin.","koken","b","f",60,2,0,0],
+ ["🥪","Sportlunch maken","Maak een gezonde lunch: wrap met kip, groente en een stuk fruit.","koken","b","a",15,1,0,0],
+ ["🃏","Kaartspel","Pesten, eenendertigen, toepen of poker (zonder geld).","spel","b","sf",30,1,0,0],
+ ["🎲","Bordspel","Haal een bordspel uit de kast en daag je familie uit.","spel","b","f",60,1,0,0],
+ ["🕹️","Gametoernooi","Organiseer een toernooitje (bijv. FC) met een schema en een prijs.","spel","b","s",90,1,1,0],
+ ["🙈","Verstoppertje","Klassiek, maar altijd leuk. In het donker nog spannender.","spel","bu","sf",30,2,0,0],
+ ["🏴","Capture the flag","Twee teams, elk een vlag. Pak de vlag van de ander zonder getikt te worden.","spel","u","s",45,3,0,0],
+ ["❓","Quiz maken","Maak 10 vragen en doe een quiz met familie.","spel","b","f",30,1,0,0],
+ ["🎭","Hints / Pictionary","Beeld een woord uit of teken het. Wie raadt het?","spel","b","sf",30,2,0,0],
+ ["🏃","Tikkertje varianten","Verlos, bevriezen of tikkertje met een bal.","spel","u","s",20,3,0,0],
+ ["🛋️","Filmavond","Kies een film, maak popcorn en doe de gordijnen dicht.","chill","b","asf",120,1,1,0],
+ ["😴","Powernap","20 minuten liggen met je ogen dicht. Je hersenen laden op.","chill","b","a",20,1,0,0],
+ ["🎧","Muziek luisteren","Maak een nieuwe playlist met nummers die je energie geven.","chill","b","a",20,1,1,0],
+ ["🛁","Lekker douchen of badderen","Na het sporten: warm water en lekker niksen.","chill","b","a",20,1,0,0],
+ ["🌬️","Ademhalen","4 seconden in, 4 vast, 4 uit, 4 vast. 5 minuten. Helpt tegen stress.","chill","b","a",5,1,0,0],
+ ["📝","Dagboek of doelen","Schrijf op: 3 dingen die goed gingen en 1 doel voor morgen.","chill","b","a",10,1,0,0],
+ ["🌳","Boom-chill","Ga onder een boom zitten met muziek of een boek.","chill","u","a",30,1,0,0],
+ ["🧹","Kamer opruimen","Zet muziek aan en ruim je kamer in 15 minuten op. Voelt goed achteraf.","helpen","b","a",15,2,0,0],
+ ["🚗","Auto wassen","Was de auto van je ouders, of van de buren voor een paar euro.","helpen","u","af",45,2,0,0],
+ ["🍂","Bladeren harken","Help in de tuin. Buren betalen er soms voor.","helpen","u","af",45,2,0,0],
+ ["🐕","Hond uitlaten","Laat de hond van iemand uit, of bied het de buren aan.","helpen","u","a",30,2,0,0],
+ ["🛒","Boodschappen doen","Pak het lijstje en doe de boodschappen voor thuis.","helpen","u","a",30,1,0,0],
+ ["🧺","Verkoop oude spullen","Verzamel speelgoed of spullen die je niet meer gebruikt en verkoop ze online of op de rommelmarkt.","helpen","bu","af",60,1,1,0],
+ ["💌","Kaartje voor opa/oma","Schrijf of teken een kaartje en stuur het op. Of bel ze even.","helpen","b","af",15,1,0,0],
+ ["🍽️","Tafel dekken & afruimen","Zonder dat iemand het vraagt. Bonuspunten bij je ouders 😉","helpen","b","f",10,1,0,0],
+ ["🏡","Help de buren","Vraag of de buren ergens hulp bij kunnen gebruiken.","helpen","u","a",30,2,0,0],
+ ["🎪","Zelf een toernooitje organiseren","Maak teams, een schema en een prijs (bijv. snoep).","vrienden","u","s",120,3,0,0],
+ ["🍿","Logeerpartij","Vraag of een vriend mag blijven slapen met film en snacks.","vrienden","b","s",240,1,0,0],
+ ["🚲","Samen op pad","Fiets met vrienden naar een plek waar je nog nooit bent geweest.","vrienden","u","s",90,2,0,0],
+ ["🎳","Bowlen of lasergamen","Spaar wat zakgeld en ga met een groepje.","vrienden","b","s",90,2,0,1],
+ ["🍦","IJsje halen","Simpel, maar het werkt altijd.","vrienden","u","sf",20,1,0,1],
+ ["🎬","Bioscoop","Kijk welke film er draait en ga met vrienden.","vrienden","b","sf",150,1,1,1],
+ ["🏃‍♂️","Parkour route","Maak met vrienden een route over bankjes en muurtjes (veilig blijven!).","vrienden","u","s",45,3,0,0],
+ ["📷","Maak een TikTok/Reel","Bedenk samen een grappig filmpje of challenge.","vrienden","bu","s",30,2,1,0],
+ /* ---- uitbreiding ---- */
+ ["🦶","Zwakke voet dag","Doe 20 minuten alles alleen met je zwakke voet: passen, schieten, dribbelen.","voetbal","u","a",20,2,0,0],
+ ["🎯","Hoekjes schieten","Hang iets in de hoeken van het doel (tas, jas) en probeer die te raken.","voetbal","u","a",30,2,0,0],
+ ["🧠","Wedstrijd analyseren","Kijk 15 minuten van een wedstrijd en let alleen op één speler op jouw positie. Wat doet hij zonder bal?","voetbal","b","a",20,1,1,0],
+ ["🔄","Rondo","Met 4 of meer: in een cirkel overspelen, 1 of 2 in het midden proberen de bal te pakken.","voetbal","u","s",30,2,0,0],
+ ["🥇","1-tegen-1 toernooi","Kleine doeltjes, iedereen speelt tegen iedereen. Wie wint de meeste duels?","voetbal","u","s",45,3,0,0],
+ ["🎪","Freestyle trucs","Leer de around the world of de neck stall. Kost tijd, maar ziet er vet uit.","voetbal","u","a",30,2,0,0],
+ ["📋","Maak je droomelftal","Stel je ultieme elftal samen met spelers uit alle tijden, met opstelling.","voetbal","b","as",20,1,0,0],
+ ["🏁","Sprint met bal","Dribbel 20 meter zo snel mogelijk, 8 keer. Bal dichtbij houden!","voetbal","u","a",15,3,0,0],
+ ["🧤","Keeperstraining","Laat iemand op je schieten, of gooi de bal tegen een muur en vang hem.","voetbal","u","as",30,3,0,0],
+ ["🪙","Tactiek met munten","Leg met munten of Lego een opstelling op tafel en bedenk hoe je team aanvalt.","voetbal","b","a",15,1,0,0],
+ ["⚡","Eerste aanname","Gooi de bal hoog en neem hem met één touch dood. Voet, dij, borst.","voetbal","u","a",15,2,0,0],
+ ["🏆","Crossbar challenge","Vanaf 16 meter: wie raakt als eerste de lat?","voetbal","u","s",20,2,0,0],
+ ["🙆","Kopbal oefenen","Gooi de bal op en kop hem naar een doel of muur. Ogen open!","voetbal","u","as",15,2,0,0],
+ ["🏋️","Core workout","3 rondes: 30 sec plank, 20 bicycle crunches, 15 superman, 30 sec zijplank per kant.","sport","b","a",15,2,0,0],
+ ["🦘","Plyo sprongen","3x10 squat jumps, 3x10 lunge jumps, 3x10 skippings. Explosief worden!","sport","u","a",15,3,0,0],
+ ["🏃‍♀️","Hardloopje","Rustig 20 minuten hardlopen in een tempo waarin je nog kunt praten.","sport","u","a",25,2,0,0],
+ ["🦩","Balans oefeningen","Op één been staan met je ogen dicht, 30 sec per been. Daarna op een kussen.","sport","b","a",10,1,0,0],
+ ["🏸","Badminton","Een paar rackets en een shuttle. Achtertuin of park.","sport","u","sf",30,2,0,0],
+ ["🎾","Tennis of padel","Huur een baan met een vriend of ouder.","sport","u","sf",60,3,0,1],
+ ["⛸️","Schaatsen","IJsbaan, of natuurijs als het vriest (alleen als het officieel veilig is).","sport","bu","sf",90,2,0,1],
+ ["🪜","Trap-training","10x de trap op en af rennen. Pak de leuning bij het afgaan.","sport","b","a",10,3,0,0],
+ ["🤸‍♂️","Leer een radslag of handstand","Tegen een muur oefenen. Kussens neerleggen!","sport","bu","a",20,2,0,0],
+ ["🚣","Kanoën of suppen","Huur een kano of sup en peddel over het water.","sport","u","sf",120,2,0,1],
+ ["🥋","Probeer een vechtsport","Veel clubs hebben een gratis proefles: judo, kickboksen, karate.","sport","b","a",60,3,0,0],
+ ["🥏","Frisbee / ultimate","Overgooien, of ultimate frisbee met twee teams.","sport","u","s",45,3,0,0],
+ ["🧍","Wall sit challenge","Hoe lang kun je tegen de muur zitten zonder stoel? Breek het record van je familie.","sport","b","af",5,2,0,0],
+ ["🌧️","Regenwandeling","Regenjas aan, laarzen aan en gewoon gaan. Plassen springen mag.","buiten","u","asf",30,2,0,0],
+ ["🍄","Paddenstoelen zoeken","In de herfst: hoeveel soorten vind je? Niet aanraken of eten!","buiten","u","asf",45,1,0,0],
+ ["🧭","Zonder telefoon de weg vinden","Fiets of loop naar een plek met alleen een papieren kaart of borden.","buiten","u","as",60,2,0,0],
+ ["🔥","Kampvuur of BBQ","Met je ouders een vuurtje of BBQ, marshmallows roosteren.","buiten","u","f",90,1,0,1],
+ ["🏞️","Speurtocht maken","Verstop 10 aanwijzingen in de buurt en laat iemand ze zoeken.","buiten","u","sf",60,2,0,0],
+ ["🌊","Naar het strand of meer","Pak een handdoek en ga zwemmen, bouwen of chillen.","buiten","u","sf",180,2,0,0],
+ ["🚶","Ommetje van 5000 stappen","Loop een ommetje en tel je stappen.","buiten","u","a",45,1,0,0],
+ ["🏰","Dam bouwen","Op het strand of in een beekje: bouw een dam die het water tegenhoudt.","buiten","u","sf",60,2,0,0],
+ ["🌄","Vroeg op voor zonsopgang","Zet je wekker en zie de zon opkomen. Voelt als een overwinning.","buiten","u","a",30,1,0,0],
+ ["🌉","Bruggen tellen","Fiets langs het water en tel hoeveel bruggen je tegenkomt.","buiten","u","as",60,2,0,0],
+ ["🐝","Bijenhotel maken","Bundel holle stengels of boor gaatjes in een blok hout en hang het op een zonnige plek.","buiten","bu","af",45,1,0,0],
+ ["🐦","Vogelvoer maken","Vet, zaadjes en een touwtje. Hang het op en kijk wie er komt.","buiten","bu","af",30,1,0,0],
+ ["🌱","Iets planten","Plant zaadjes (tomaat, kers, zonnebloem) en kijk elke dag hoe ze groeien.","buiten","bu","af",20,1,0,0],
+ ["🐸","Slootje kijken","Met een netje en een bak: wat leeft er in de sloot? Zet alles weer terug.","buiten","u","as",45,1,0,0],
+ ["🍁","Bladeren-collectie","Verzamel 10 verschillende bladeren en zoek op van welke boom ze komen.","buiten","u","a",30,1,0,0],
+ ["🦔","Egelhuis bouwen","Een plekje van takken en bladeren in de tuin waar een egel kan wonen.","buiten","u","af",30,1,0,0],
+ ["🗑️","Zwerfafval prikken","Pak een zak en handschoenen en maak je straat of veldje schoon.","buiten","u","asf",30,2,0,0],
+ ["🐐","Kinderboerderij","Ga dieren bekijken en voeren. Vaak gratis.","buiten","u","f",60,1,0,0],
+ ["🔭","Maan bekijken","Met een verrekijker naar de maan: je ziet kraters!","buiten","u","af",15,1,0,0],
+ ["🦋","Insecten-safari","Zoek op je knieën in het gras: hoeveel beestjes vind je in 10 minuten?","buiten","u","a",15,1,0,0],
+ ["🖌️","Schilderen","Pak verf en maak een schilderij van een plek waar je graag bent.","creatief","b","a",45,1,0,0],
+ ["💥","Maak een strip","Teken een strip van 6 plaatjes over iets grappigs dat je meemaakte.","creatief","b","a",40,1,0,0],
+ ["✂️","Collage maken","Knip plaatjes uit oude tijdschriften en maak een poster van je dromen.","creatief","b","a",40,1,0,0],
+ ["🎞️","Film maken","Schrijf een kort script en film het met vrienden. Actie, horror of comedy.","creatief","bu","s",120,2,1,0],
+ ["🪵","Iets van hout maken","Met hulp: een vogelhuisje, een plankje of een doeltje.","creatief","b","f",90,2,0,1],
+ ["🧵","Armbandjes maken","Knoop vriendschapsbandjes of rijg kralen.","creatief","b","as",30,1,0,0],
+ ["🎢","Knikkerbaan bouwen","Van wc-rollen, karton en tape. Hoe langer, hoe beter.","creatief","b","asf",60,1,0,0],
+ ["✈️","Papieren vliegtuigen","Vouw 5 verschillende modellen. Welke vliegt het verst?","creatief","b","as",20,1,0,0],
+ ["🅰️","Graffiti-ontwerp op papier","Ontwerp je naam in graffiti-letters.","creatief","b","a",30,1,0,0],
+ ["🖼️","Foto-project","Maak een fotoserie van één onderwerp: schaduwen, schoenen, deuren…","creatief","u","a",45,1,1,0],
+ ["🥁","Drumstel van pannen","Pannen, emmers en houten lepels. Maak een beat (vraag eerst even 😅).","creatief","b","a",15,2,0,0],
+ ["🗿","Kleien","Maak een figuurtje of je eigen beker van klei.","creatief","b","a",45,1,0,0],
+ ["🧑‍🎨","Portret tekenen","Teken iemand uit je familie terwijl die stil zit.","creatief","b","f",30,1,0,0],
+ ["🪐","Ruimte-avond","Zoek uit hoe groot de planeten zijn en maak een schaalmodel met fruit.","leren","b","af",30,1,1,0],
+ ["🗺️","Hoofdsteden leren","Leer de hoofdsteden van Europa. Test jezelf na 15 minuten.","leren","b","a",15,1,0,0],
+ ["🌋","Vulkaan bouwen","Klei of papier-maché, baking soda en azijn. Boem!","leren","bu","af",45,2,0,0],
+ ["🕵️","Geheimschrift","Bedenk een geheime code en stuur een bericht naar een vriend.","leren","b","as",20,1,0,0],
+ ["🧩","Geheugentraining","Leg 20 voorwerpen neer, kijk 1 minuut, dek af. Hoeveel weet je nog?","leren","b","af",10,1,0,0],
+ ["📖","Biografie van een sporter","Lees over het leven van een topsporter. Wat deed hij anders?","leren","b","a",30,1,0,0],
+ ["🎙️","Spreekbeurt-oefening","Vertel 2 minuten over een onderwerp aan je familie, zonder papiertje.","leren","b","f",15,1,0,0],
+ ["🔢","Sudoku of kruiswoord","Maak een puzzel uit de krant of een boekje.","leren","b","a",20,1,0,0],
+ ["🌡️","Weerstation","Meet een week elke dag de temperatuur en regen en maak er een grafiek van.","leren","bu","a",10,1,0,0],
+ ["🧲","Magneten-onderzoek","Wat trekt een magneet aan en wat niet? Test 20 dingen in huis.","leren","b","a",15,1,0,0],
+ ["🏛️","Museum bezoeken","Kies een museum over iets wat je interessant vindt: sport, techniek, geschiedenis.","leren","b","f",120,1,0,1],
+ ["💡","Uitvinding bedenken","Bedenk een uitvinding die een probleem oplost en teken hoe hij werkt.","leren","b","a",20,1,0,0],
+ ["🔧","Fiets onderhouden","Banden oppompen, ketting smeren en remmen checken.","techniek","u","af",20,1,0,0],
+ ["🤖","Robot van karton","Bouw een robot, of programmeer er een als je een kit hebt.","techniek","b","a",60,1,0,0],
+ ["🔌","Iets uit elkaar halen","Vraag een kapot apparaat en kijk hoe het van binnen werkt (stekker eruit!).","techniek","b","af",45,1,0,0],
+ ["🍝","Spaghetti-brug","Bouw een brug van spaghetti of rietjes. Hoeveel gewicht houdt hij?","techniek","b","asf",45,1,0,0],
+ ["🚀","Waterraket","Lege fles, water en een fietspomp (met hulp). Lanceer hem buiten!","techniek","u","sf",45,2,0,0],
+ ["💻","Website maken","Maak je eigen simpele website over je favoriete club.","techniek","b","a",60,1,1,0],
+ ["👾","Zelf een game maken","In Scratch of een andere gratis tool. Begin met iets kleins.","techniek","b","a",60,1,1,0],
+ ["🥚","Eierval-experiment","Bouw iets waarmee een ei een val van 2 meter overleeft.","techniek","bu","asf",45,1,0,0],
+ ["🌯","Wraps maken","Kip, groente, saus, kaas. Iedereen maakt zijn eigen.","koken","b","f",30,1,0,0],
+ ["🍌","Bananenbrood bakken","Gebruik overrijpe bananen. Simpel en lekker.","koken","b","af",60,1,0,0],
+ ["🍲","Pasta-avond","Kook pasta met een zelfgemaakte saus.","koken","b","f",40,1,0,0],
+ ["🍓","Fruitspiesjes","Snijd fruit en rijg het aan stokjes. Gezonde snack.","koken","b","af",15,1,0,0],
+ ["🧁","Cupcakes versieren","Bak cupcakes en versier ze als voetballen.","koken","b","af",75,1,0,0],
+ ["🍳","Perfect ei","Leer een ei bakken, koken en roerei maken. De basis!","koken","b","a",20,1,0,0],
+ ["🥣","Sportsnack maken","Kwark met fruit en noten, of energieballetjes met havermout.","koken","b","a",15,1,0,0],
+ ["🍔","Hamburgers maken","Zelf de burgers kneden en bakken.","koken","b","f",45,1,0,0],
+ ["🎯","Darten","Op een dartbord (voorzichtig!) of met een magnetisch bord.","spel","b","sf",30,1,0,0],
+ ["🔐","Escape room thuis","Bedenk raadsels en verstop een schat voor je familie.","spel","b","f",60,1,0,0],
+ ["🎱","Zelf een spel bedenken","Bedenk een nieuw spel met regels en test het.","spel","bu","sf",30,2,0,0],
+ ["🐺","Weerwolven","Met een groep: wie is de weerwolf? Hoe meer spelers, hoe leuker.","spel","b","s",45,1,0,0],
+ ["🔤","Woordspel","Galgje, 30 Seconds of Scrabble.","spel","b","sf",30,1,0,0],
+ ["🏓","Rondje pingpong","Iedereen loopt om de tafel en slaat één keer. Mis je? Eruit!","spel","b","sf",30,3,0,0],
+ ["🍾","Flessen-bowling","10 lege flessen en een bal in de gang.","spel","b","sf",20,2,0,0],
+ ["🪙","Muntje voetbal","Schiet een munt met je vinger tussen de vingers van je tegenstander door.","spel","b","sf",15,1,0,0],
+ ["🧱","Stoeprandje","Gooi de bal tegen de stoeprand. Komt hij terug? Punt!","spel","u","as",20,2,0,0],
+ ["🤔","Wie ben ik?","Briefje op je voorhoofd, stel ja/nee-vragen.","spel","b","sf",20,1,0,0],
+ ["📵","Een uur zonder telefoon","Leg je telefoon weg en kijk wat er gebeurt. Verveling = creativiteit.","chill","bu","a",60,1,0,0],
+ ["🧊","Koude douche challenge","Laatste 30 seconden van je douche koud. Stay hard!","chill","b","a",5,2,0,0],
+ ["🌀","Mandala kleuren","Klinkt kinderachtig, maar kleuren is echt ontspannend.","chill","b","a",20,1,0,0],
+ ["🧘‍♂️","Bodyscan","Lig op je rug en ga in je hoofd van je tenen naar je kruin. Ontspan elk stukje.","chill","b","a",10,1,0,0],
+ ["📻","Luisterboek of podcast","Luister een aflevering terwijl je op bed ligt.","chill","b","a",30,1,1,0],
+ ["🛏️","Kamer anders inrichten","Zet je bed of bureau anders. Voelt als een nieuwe kamer.","chill","b","a",45,2,0,0],
+ ["☕","Warme chocomelk moment","Maak chocomelk en ga ermee bij het raam zitten.","chill","b","a",15,1,0,0],
+ ["🌟","Visionboard","Maak een bord met je doelen: voetbal, school, dromen.","chill","b","a",30,1,0,0],
+ ["🎯","Doel voor deze week","Schrijf één doel op voor school, één voor voetbal en één voor thuis.","groei","b","a",10,1,0,0],
+ ["📈","Record-dag","Kies één ding (push-ups, hooghouden, lezen) en zet een nieuw record.","groei","bu","a",15,2,0,0],
+ ["🙏","Dankbaarheid","Schrijf 3 dingen op waar je dankbaar voor bent.","groei","b","a",5,1,0,0],
+ ["💬","Complimenten geven","Geef vandaag 3 mensen een echt compliment.","groei","bu","asf",5,1,0,0],
+ ["😬","Iets doen wat je eng vindt","Iets kleins: iemand aanspreken, een nieuwe trick proberen, je vinger opsteken in de klas.","groei","bu","a",15,2,0,0],
+ ["🗓️","Plan je week","Zet je trainingen, toetsen en vrije tijd op papier.","groei","b","a",15,1,0,0],
+ ["📚","10 pagina's per dag","Begin een boek en lees elke dag 10 pagina's.","groei","b","a",15,1,0,0],
+ ["💧","Gewoonte-dag","Kies één goede gewoonte (genoeg water, vroeg naar bed) en doe het de hele dag.","groei","b","a",5,1,0,0],
+ ["🚲","Fietsen poetsen","Poets je fiets of die van het hele gezin. Buren betalen soms!","helpen","u","af",30,1,0,0],
+ ["🪴","Planten water geven","Geef alle planten water, ook in de tuin.","helpen","bu","a",10,1,0,0],
+ ["🗂️","Schuur opruimen","Help je ouders met een rommelig hok. Misschien vind je schatten.","helpen","b","f",60,2,0,0],
+ ["🍋","Limonadekraam","Maak limonade of koekjes en verkoop ze voor je huis (vraag het eerst).","helpen","u","sf",90,1,0,1],
+ ["🐾","Dierenasiel helpen","Vraag of je mag helpen of katten mag knuffelen (met een ouder).","helpen","b","f",90,1,0,0],
+ ["👕","Was opvouwen","Vouw de was op voor het hele gezin.","helpen","b","a",15,1,0,0],
+ ["📬","Folderwijk","Vraag of je een kranten- of folderwijk mag doen.","helpen","u","a",60,2,0,0],
+ ["🫖","Iemand bezoeken","Ga langs bij opa, oma of een oudere buur en drink een kopje thee.","helpen","b","f",45,1,0,0],
+ ["⛺","Tentje in de tuin","Zet een tent op in de tuin en slaap buiten.","vrienden","u","s",240,1,0,0],
+ ["🕹️","Retro-gamemiddag","Speel oude games of klassieke spellen.","vrienden","b","s",90,1,1,0],
+ ["🍕","Pizza-avond met vrienden","Iedereen neemt één topping mee.","vrienden","b","s",120,1,0,1],
+ ["🚴‍♂️","Fietsrace met checkpoints","Bedenk een route met checkpoints. Wie is het eerst terug?","vrienden","u","s",60,3,0,0],
+ ["🎤","Karaoke","Zing je favoriete nummers. Niemand hoeft goed te kunnen zingen.","vrienden","b","sf",45,2,1,0],
+ ["🏅","Mini-olympiade","5 onderdelen: sprint, verspringen, hooghouden, werpen, touwtrekken.","vrienden","u","s",90,3,0,0],
+ ["🧺","Picknick","Iedereen neemt wat mee. Park in, kleed neer.","vrienden","u","sf",90,1,0,0],
+ ["📽️","Quizshow","Eén is presentator, de rest speelt. Met punten en prijzen.","vrienden","b","s",45,1,0,0],
+ ["🎡","Pretpark","Spaar en plan een dag met familie of vrienden.","vrienden","u","sf",480,3,0,1],
+ ["🏟️","Wedstrijd in het stadion","Ga naar een wedstrijd: een profclub, of de amateurs bij jou in de buurt (vaak gratis).","vrienden","u","sf",150,2,0,1],
+ ["🦁","Dierentuin","Een hele dag dieren kijken.","vrienden","u","f",300,2,0,1],
+ ["🏙️","Stad verkennen","Neem de trein of fiets naar een stad waar je nog nooit was.","vrienden","u","sf",240,2,0,1],
+ ["🌊","Subtropisch zwembad","Glijbanen, golfslagbad en friet.","vrienden","b","sf",240,3,0,1],
+ ["🤾","Trampolinepark","Springen tot je benen trillen.","vrienden","b","s",120,3,0,1],
+ ["🧗‍♀️","Boulderhal","Klimmen zonder touw op lage muren. Super goed voor kracht.","vrienden","b","sf",90,3,0,1],
+ ["🚂","Treinreisje","Kies een willekeurige plek op de kaart en ga erheen.","vrienden","u","sf",300,1,0,1],
+ ["🤖","Laat AI een training maken","Vraag een AI om een voetbaltraining van 30 minuten voor thuis. Doe hem daarna ook echt!","ai","bu","a",30,2,1,0],
+ ["📖","Schrijf een verhaal met AI","Jij schrijft een zin, de AI de volgende. Wie maakt het gekste verhaal?","ai","b","as",30,1,1,0],
+ ["🎨","Maak een AI-plaatje","Beschrijf je droomstadion of je eigen voetbalshirt en laat AI er een plaatje van maken.","ai","b","a",20,1,1,0],
+ ["❓","Laat AI je overhoren","Vraag een AI om 10 quizvragen over een schoolvak of je toets. Hoeveel heb je goed?","ai","b","a",20,1,1,0],
+ ["🧠","Leer hoe AI werkt","Zoek uit hoe een AI leert. Kun je het in 3 zinnen uitleggen aan je ouders?","ai","b","a",20,1,1,0],
+ ["🕵️","Echt of AI?","Bekijk plaatjes of filmpjes en raad of ze echt zijn of door AI gemaakt. Waar zie je het aan?","ai","b","asf",20,1,1,0],
+ ["💡","Bedenk een app met AI","Bedenk samen met een AI een app die jij zou willen. Wat doet hij en hoe ziet hij eruit?","ai","b","a",30,1,1,0],
+ ["🎵","Maak een liedje met AI","Laat AI een tekst schrijven over jouw team en verzin er zelf een melodie bij.","ai","b","as",30,1,1,0],
+ ["🧑‍🍳","AI-chef","Vertel een AI wat er in de koelkast ligt en vraag om een recept. Kook het daarna (met hulp)!","ai","b","af",45,1,1,0],
+ ["🌍","Interview een beroemdheid uit het verleden","Laat AI doen alsof hij Johan Cruijff, Einstein of Napoleon is en stel hem vragen.","ai","b","a",20,1,1,0],
+ ["🗣️","Oefen een taal met AI","Voer een gesprekje in het Engels of Spaans met een AI en vraag om verbeteringen.","ai","b","a",15,1,1,0],
+ ["🧩","Laat AI raadsels maken","Vraag om 5 lastige raadsels en daag je familie uit.","ai","b","f",20,1,1,0],
+ ["⚠️","Betrap de AI op een fout","AI zegt soms dingen die niet kloppen. Vraag iets wat je zeker weet en check of het klopt.","ai","b","a",15,1,1,0],
+ ["📊","Analyseer je wedstrijd met AI","Vertel een AI wat er goed en fout ging in je wedstrijd en vraag om 3 verbeterpunten.","ai","b","a",15,1,1,0],
+ ["🎮","Laat AI een spel bedenken","Vraag een AI om een nieuw buitenspel met een bal. Test het met vrienden.","ai","bu","s",30,2,1,0],
+ ["👾","Programmeer met AI-hulp","Maak een simpel spelletje in Scratch en vraag een AI om hulp als je vastloopt.","ai","b","a",45,1,1,0],
+ ["📝","Laat AI je spreekbeurt checken","Schrijf zelf je tekst en vraag een AI om tips. Niet laten schrijven, wel laten verbeteren!","ai","b","a",20,1,1,0],
+ ["🛡️","Leer AI veilig gebruiken","Zoek uit wat je nooit aan een AI vertelt (adres, wachtwoorden, foto's van anderen) en maak een lijstje.","ai","b","af",10,1,1,0],
+ ["📅","Laat AI je week plannen","Vertel een AI wanneer je training, school en toetsen hebt en vraag om een slim weekschema.","ai","b","a",15,1,1,0],
+ ["🔍","Vergelijk twee AI's","Stel dezelfde vraag aan twee verschillende AI's. Welk antwoord is beter en waarom?","ai","b","a",15,1,1,0],
+ ["🔦","Stroomkring maken","Batterij, lampje en draadjes: laat het lampje branden. Kun je er een schakelaar bij maken?","techniek","b","a",30,1,0,0],
+ ["🪁","Zelf een vlieger bouwen","Stokjes, een plastic zak en touw. Werkt hij bij wind?","techniek","bu","af",60,1,0,0],
+ ["⛵","Bootje bouwen","Van kurk, karton of hout. Blijft hij drijven? Hoeveel muntjes kan hij dragen?","techniek","bu","as",45,1,0,0],
+ ["🏎️","Ballonauto","Rietje, ballon en doppen als wielen. Hoe ver rijdt hij?","techniek","b","as",45,1,0,0],
+ ["🥅","Zelf een doeltje bouwen","Van pvc-buis of hout met een oud net. Daarna meteen testen!","techniek","u","f",90,2,0,1],
+ ["⚙️","Lego-machine","Bouw een machine die beweegt: een katapult, lift of knikkerlift.","techniek","b","a",60,1,0,0],
+ ["🗼","Toren-challenge","Bouw in 15 minuten de hoogste toren van papier en tape.","techniek","b","asf",20,1,0,0],
+ ["🎯","Katapult bouwen","Van ijsstokjes en elastiekjes. Schiet propjes in een beker.","techniek","b","as",30,1,0,0],
+ ["🌅","Ochtendroutine","Opstaan, bed opmaken, glas water, 10 push-ups. Begin je dag sterk.","groei","b","a",10,2,0,0],
+ ["📓","Wedstrijd-reflectie","Schrijf na een wedstrijd op: 3 dingen die goed gingen en 1 ding dat beter kan.","groei","b","a",10,1,0,0],
+ ["🎬","Motivatievideo","Kijk een korte video van een topsporter en schrijf op wat je ervan leert.","groei","b","a",15,1,1,0],
+ ["🎯","Focus-oefening","5 minuten stil zitten en alleen op je ademhaling letten. Dwaal je af? Gewoon terug.","groei","b","a",5,1,0,0],
+ ["🚫","Geen-klagen-dag","Een hele dag niet klagen of zeuren. Lukt het jou?","groei","bu","a",5,1,0,0],
+ ["🪞","Visualiseren","Sluit je ogen en stel je voor hoe je morgen een perfecte actie maakt. Zo trainen profs ook.","groei","b","a",5,1,0,0],
+ ["😴","Op tijd naar bed","Leg je telefoon een uur voor het slapen weg. Morgen ben je fitter.","groei","b","a",5,1,0,0],
+ ["🌠","Schrijf je grote droom op","Wat wil je over 5 jaar? Welke kleine stap zet je deze week?","groei","b","a",15,1,0,0],
+ ["🔁","Fouten-lijstje","Schrijf een fout op die je deze week maakte en wat je ervan leerde. Fouten = leren.","groei","b","a",10,1,0,0],
+ ["🤝","Iemand helpen zonder dat het gevraagd wordt","Doe vandaag iets aardigs voor iemand, zonder dat diegene erom vraagt.","groei","bu","asf",10,1,0,0]
+];
+
+const ITEMS = RAW.map((r,i)=>({id:"d"+i,e:r[0],t:r[1],d:r[2],c:r[3],w:r[4],who:r[5],m:r[6],en:r[7],s:r[8],k:r[9]}));
+
+/* ===== OPSLAG ===== */
+const KEY="watkanikdoen_v1";
+let st={fav:[],own:[],done:[],last:[]};
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x)st=Object.assign(st,x)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+
+const all=()=>ITEMS.concat(st.own);
+const byId=id=>all().find(x=>x.id===id);
+
+/* ===== FILTERS ===== */
+const F={waar:"*",wie:"*",tijd:"*",energie:"*",noScreen:false,free:false};
+document.querySelectorAll(".chips[data-f]").forEach(g=>{
+  g.addEventListener("click",ev=>{
+    const c=ev.target.closest(".chip");if(!c)return;
+    g.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+    c.classList.add("on");F[g.dataset.f]=c.dataset.v;updCount();
+  });
+});
+["noScreen","free"].forEach(id=>{
+  document.getElementById(id).onclick=e=>{F[id]=!F[id];e.currentTarget.classList.toggle("on",F[id]);updCount()};
+});
+
+function matches(x){
+  if(F.waar!=="*"&&!x.w.includes(F.waar))return false;
+  if(F.wie!=="*"&&!x.who.includes(F.wie))return false;
+  if(F.tijd!=="*"){
+    const t=+F.tijd;
+    if(t===15&&x.m>20)return false;
+    if(t===60&&(x.m<=20||x.m>90))return false;
+    if(t===999&&x.m<=90)return false;
+  }
+  if(F.energie!=="*"&&x.en!=+F.energie)return false;
+  if(F.noScreen&&x.s)return false;
+  if(F.free&&x.k)return false;
+  return true;
+}
+function pool(){return all().filter(matches)}
+function updCount(){
+  const n=pool().length;
+  document.getElementById("count").textContent=n?n+" ideeën passen bij jouw keuze":"Niks gevonden 😕 probeer minder filters";
+}
+
+/* ===== RESULTAAT ===== */
+const WAAR={b:"🏠 Binnen",u:"🌳 Buiten",bu:"🏠/🌳"};
+function tijdTxt(m){return m<60?m+" min":(m%60?(m/60).toFixed(1).replace(".",","):m/60)+" uur"}
+function tags(x){
+  const en=["","😌 Rustig","🙂 Normaal","🔥 Vol gas"][x.en]||"";
+  return `<span class="tag">${CATS[x.c]?CATS[x.c].e+" "+CATS[x.c].n:"✏️ Eigen"}</span>
+  <span class="tag">${WAAR[x.w]||""}</span><span class="tag">⏱️ ${tijdTxt(x.m)}</span><span class="tag">${en}</span>
+  ${x.s?'<span class="tag">📱 scherm</span>':''}${x.k?'<span class="tag">💶 kost geld</span>':''}`;
+}
+function showResult(x){
+  const r=document.getElementById("res");
+  const isFav=st.fav.includes(x.id);
+  r.innerHTML=`<div class="emo">${x.e}</div><h2>${esc(x.t)}</h2><p>${esc(x.d||"")}</p>
+  <div class="tags">${tags(x)}</div>
+  <div class="row">
+    <button class="btn" id="rAgain">🔄 Andere</button>
+    <button class="btn fav ${isFav?"on":""}" id="rFav">${isFav?"❤️":"🤍"} Favoriet</button>
+    <button class="btn ok" id="rDone">✅ Gedaan</button>
+  </div>`;
+  r.classList.remove("show");void r.offsetWidth;r.classList.add("show");
+  document.getElementById("rAgain").onclick=spin;
+  document.getElementById("rFav").onclick=()=>{toggleFav(x.id);showResult(x)};
+  document.getElementById("rDone").onclick=()=>markDone(x.id);
+}
+function spin(){
+  const p=pool();if(!p.length){updCount();return}
+  // vermijd recente
+  let cand=p.filter(x=>!st.last.includes(x.id));if(!cand.length)cand=p;
+  // favorieten iets vaker
+  const w=[];cand.forEach(x=>{w.push(x);if(st.fav.includes(x.id))w.push(x)});
+  const x=w[Math.floor(Math.random()*w.length)];
+  st.last=[x.id].concat(st.last).slice(0,Math.min(8,Math.floor(p.length/2)));save();
+  const b=document.getElementById("go");b.textContent="🎲 …";
+  setTimeout(()=>{b.textContent="🎲 Geef me iets!";showResult(x)},250);
+}
+document.getElementById("go").onclick=spin;
+
+/* ===== ACTIES ===== */
+function toggleFav(id){
+  const i=st.fav.indexOf(id);if(i>-1)st.fav.splice(i,1);else{st.fav.push(id);toast("❤️ Toegevoegd aan favorieten")}
+  save();renderFav();
+}
+function markDone(id){
+  st.done.unshift({id,at:Date.now()});save();renderDone();
+  const msgs=["Lekker bezig! 💪","Top gedaan! 🔥","Goed zo! ⭐","Weer iets gedaan! 🙌"];
+  toast(msgs[Math.floor(Math.random()*msgs.length)]);
+}
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1600)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function itemRow(x,extra){
+  return `<div class="item"><div class="e">${x.e}</div><div class="t"><b>${esc(x.t)}</b><span>${extra||tijdTxt(x.m)+" · "+(WAAR[x.w]||"")}</span></div>`;
+}
+
+/* ===== CATEGORIEËN ===== */
+function renderCats(){
+  const v=document.getElementById("catView");
+  v.innerHTML='<div class="cat">'+Object.entries(CATS).map(([k,c])=>{
+    const n=all().filter(x=>x.c===k).length;
+    return `<button data-c="${k}"><i>${c.e}</i>${c.n}<br><small>${n} ideeën</small></button>`;
+  }).join("")+"</div>";
+  v.querySelectorAll("button[data-c]").forEach(b=>b.onclick=()=>openCat(b.dataset.c));
+}
+function openCat(k){
+  const v=document.getElementById("catView");
+  const list=all().filter(x=>x.c===k);
+  v.innerHTML=`<button class="back" id="bk">‹ Terug</button><h2 style="margin:4px 0">${CATS[k].e} ${CATS[k].n}</h2>
+  <div class="list">${list.map(x=>itemRow(x)+`<button class="ib" data-f="${x.id}">${st.fav.includes(x.id)?"❤️":"🤍"}</button><button class="ib" data-o="${x.id}">›</button></div>`).join("")}</div>`;
+  document.getElementById("bk").onclick=renderCats;
+  v.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{toggleFav(b.dataset.f);openCat(k)});
+  v.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{go("home");showResult(byId(b.dataset.o));window.scrollTo(0,document.body.scrollHeight)});
+}
+
+/* ===== FAVORIETEN ===== */
+function renderFav(){
+  const el=document.getElementById("favList");
+  const list=st.fav.map(byId).filter(Boolean);
+  if(!list.length){el.innerHTML='<div class="empty">Nog geen favorieten.<br>Tik op 🤍 bij iets wat je leuk vindt.</div>';return}
+  el.innerHTML=list.map(x=>itemRow(x)+`<button class="ib" data-o="${x.id}">›</button><button class="ib" data-r="${x.id}">✕</button></div>`).join("");
+  el.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>toggleFav(b.dataset.r));
+  el.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{go("home");showResult(byId(b.dataset.o));window.scrollTo(0,document.body.scrollHeight)});
+}
+
+/* ===== EIGEN IDEEËN ===== */
+const oCat=document.getElementById("oCat");
+oCat.innerHTML=Object.entries(CATS).map(([k,c])=>`<option value="${k}">${c.e} ${c.n}</option>`).join("");
+document.getElementById("oAdd").onclick=()=>{
+  const t=document.getElementById("oTitle").value.trim();if(!t){toast("Vul eerst iets in ✏️");return}
+  st.own.push({id:"o"+Date.now(),e:document.getElementById("oEmo").value.trim()||"⭐",t,
+    d:document.getElementById("oDesc").value.trim(),c:oCat.value,w:document.getElementById("oWaar").value,
+    who:document.getElementById("oWie").value,m:30,en:2,s:0,k:0});
+  save();["oTitle","oDesc","oEmo"].forEach(i=>document.getElementById(i).value="");
+  renderOwn();updCount();toast("✅ Idee toegevoegd");
+};
+function renderOwn(){
+  const el=document.getElementById("ownList");
+  if(!st.own.length){el.innerHTML='<div class="empty">Nog geen eigen ideeën.</div>';return}
+  el.innerHTML=st.own.map(x=>itemRow(x,(CATS[x.c]?CATS[x.c].n:"")+" · "+(WAAR[x.w]||""))+`<button class="ib" data-r="${x.id}">🗑️</button></div>`).join("");
+  el.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{
+    if(!confirm("Dit idee verwijderen?"))return;
+    st.own=st.own.filter(x=>x.id!==b.dataset.r);st.fav=st.fav.filter(f=>f!==b.dataset.r);save();renderOwn();renderFav();updCount();
+  });
+}
+
+/* ===== GEDAAN ===== */
+function dayKey(t){const d=new Date(t);return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate()}
+function renderDone(){
+  const el=document.getElementById("doneList");
+  document.getElementById("sTot").textContent=st.done.length;
+  const now=new Date();const mon=new Date(now);mon.setHours(0,0,0,0);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
+  document.getElementById("sWeek").textContent=st.done.filter(d=>d.at>=mon.getTime()).length;
+  const days=new Set(st.done.map(d=>dayKey(d.at)));let s=0;const c=new Date();
+  if(!days.has(dayKey(c)))c.setDate(c.getDate()-1);
+  while(days.has(dayKey(c))){s++;c.setDate(c.getDate()-1)}
+  document.getElementById("sStreak").textContent=s;
+  if(!st.done.length){el.innerHTML='<div class="empty">Nog niks gedaan.<br>Druk op 🎲 en ga iets doen!</div>';return}
+  el.innerHTML=st.done.slice(0,100).map((d,i)=>{
+    const x=byId(d.id);if(!x)return"";
+    const dt=new Date(d.at).toLocaleDateString("nl-NL",{weekday:"short",day:"numeric",month:"short"});
+    return itemRow(x,dt)+`<button class="ib" data-i="${i}">✕</button></div>`;
+  }).join("");
+  el.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{st.done.splice(+b.dataset.i,1);save();renderDone()});
+}
+
+/* ===== NAVIGATIE ===== */
+function go(p){
+  document.querySelectorAll(".page").forEach(x=>x.classList.toggle("on",x.id==="p-"+p));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
+  if(p==="cat")renderCats();if(p==="fav")renderFav();if(p==="own")renderOwn();if(p==="done")renderDone();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>go(b.dataset.p));
+
+updCount();renderFav();renderOwn();renderDone();
+
+/* ===== OFFLINE ===== */
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>
